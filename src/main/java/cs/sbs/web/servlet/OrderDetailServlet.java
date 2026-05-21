@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Map;
 
 @WebServlet("/order/*")
 public class OrderDetailServlet extends HttpServlet {
@@ -17,7 +18,6 @@ public class OrderDetailServlet extends HttpServlet {
         response.setContentType("text/plain;charset=UTF-8");
         PrintWriter out = response.getWriter();
 
-        // 获取路径参数 /order/1 → 提取1
         String path = request.getPathInfo();
         if (path == null || path.length() <= 1) {
             out.println("Error: Order not found");
@@ -32,14 +32,13 @@ public class OrderDetailServlet extends HttpServlet {
             return;
         }
 
-        // 获取订单数据
-        OrderCreateServlet createServlet = (OrderCreateServlet) getServletContext().getAttribute("orderCreateServlet");
-        if (createServlet == null) {
+        Map<Integer, Order> orderDB = (Map<Integer, Order>) getServletContext().getAttribute("orderDB");
+        if (orderDB == null) {
             out.println("Error: Order not found");
             return;
         }
 
-        Order order = createServlet.getOrderDB().get(orderId);
+        Order order = orderDB.get(orderId);
         if (order == null) {
             out.println("Error: Order not found");
         } else {
