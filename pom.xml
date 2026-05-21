@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
+    <groupId>cs.sbs.web</groupId>
     <artifactId>food-order-servlet-assignment</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0</version>
     <packaging>war</packaging>
 
     <properties>
@@ -16,36 +16,16 @@
     </properties>
 
     <dependencies>
-        <!-- Servlet API -->
+        <!-- 仅保留Servlet依赖，无任何服务器插件 -->
         <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>5.0.0</version>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
 
     <build>
-        <plugins>
-            <!--
-                Note: The original tutorial specified tomcat7-maven-plugin, but it does not support Jakarta EE 9/10 (Servlet 5.0/6.0).
-                We use jetty-maven-plugin (version 11+) which supports Jakarta EE 10.
-                Run with: mvn jetty:run
-            -->
-            <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>11.0.25</version>
-                <configuration>
-                    <httpConnector>
-                        <port>8080</port>
-                    </httpConnector>
-                    <webApp>
-                        <contextPath>/</contextPath>
-                    </webApp>
-                </configuration>
-            </plugin>
-        </plugins>
+        <!-- 清空plugins标签，不配置任何运行插件 -->
     </build>
-
 </project>
