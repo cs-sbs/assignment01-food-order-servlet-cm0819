@@ -1,6 +1,7 @@
 package cs.sbs.web.servlet;
 
 import cs.sbs.web.model.Order;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,8 +15,15 @@ import java.util.Map;
 
 @WebServlet("/order/create")
 public class OrderCreateServlet extends HttpServlet {
-    private final Map<Integer, Order> orderDB = new HashMap<>();
-    private int autoId = 1;
+    @Override
+    public void init() {
+        // 把订单库存到全局上下文，让OrderDetailServlet读取
+        ServletContext ctx = getServletContext();
+        if (ctx.getAttribute("orderDB") == null) {
+            ctx.setAttribute("orderDB", new HashMap<Integer, Order>());
+            ctx.setAttribute("autoId", 1);
+        }
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -23,13 +31,11 @@ public class OrderCreateServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         request.setCharacterEncoding("UTF-8");
 
-        // 获取表单参数
         String customer = request.getParameter("customer");
         String food = request.getParameter("food");
         String qtyStr = request.getParameter("quantity");
 
-        // 参数校验
-        if (customer == null || food == null || qtyStr == null || customer.isEmpty() || food.isEmpty()) {
+        if (customer == null || food == null || qtyStr == null || customer.isBlank() || food.isBlank()) {
             out.println("Error: Missing required parameters");
             return;
         }
@@ -43,15 +49,14 @@ public class OrderCreateServlet extends HttpServlet {
             return;
         }
 
-        // 创建订单
+        ServletContext ctx = getServletContext();
+        Map<Integer, Order> orderDB = (Map<Integer, Order>) ctx.getAttribute("orderDB");
+        int autoId = (Integer) ctx.getAttribute("autoId");
+
         Order newOrder = new Order(autoId, customer, food, quantity);
         orderDB.put(autoId, newOrder);
         out.println("Order Created: " + autoId);
-        autoId++;
-    }
 
-    // 给订单详情Servlet共享订单数据
-    public Map<Integer, Order> getOrderDB() {
-        return orderDB;
+        ctx.setAttribute("autoId", autoId + 1);
     }
 }
